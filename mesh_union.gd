@@ -111,39 +111,48 @@ func _on_preview_confirm() -> void:
 	gm.name = origin_name
 	if !$NameLine.text.is_empty():
 		gm.name = $NameLine.text
+	
 	## increment integer at the end of the name string until no sibling shares an identical name
 	var siblings:PackedStringArray = []
 	for n in ei.get_edited_scene_root().get_children():
 		siblings.append(n.name)
-	var i:int = 0
-	var gmn:String = gm.name
-	var gmni:String = ""
+	if siblings.has(gm.name):
+		var i:int = 0
+		var gmn:String = gm.name
+		var gmni:String = ""
+		
+		## find whole valid integer at end of gmn
+		while i < gmn.length() && gmn[-i - 1].is_valid_int():
+			i += 1
+		if i > 0:
+			gmni = gmn.substr(gmn.length() - i, -1)
+		
+		## if integer begins with 0s, remove them
+		## if no integer was found, mimic Godot's behaviour and set as "2"
+		if !gmni.is_empty():
+			i = 0
+			while gmni[i] == "0":
+				i += 1
+			gmni = gmni.erase(0, i)
+			## remove gmni from gmn
+			gmn = gmn.erase(gmn.length() - gmni.length(), gmni.length())
+		else:
+			gmni = "2"
+		
+		
+		## increment i until the new name is no longer identical to a sibling
+		i = int(gmni)
+		while siblings.has(gmn + gmni):
+			i += 1
+			gmni = str(i)
+		gm.name = gmn + gmni
 	
-	while i < gmn.length() && gmn[-i - 1].is_valid_int():
-		i += 1
-	
-	gmni = gmn.substr(gmn.length() - i, -1)
-	i = 0
-	while gmni[i] == "0":
-		i += 1
-	gmni = gmni.erase(0, i)
-	gmn = gmn.erase(gmn.length() - gmni.length(), gmni.length())
-	var c:int = int(gmni)
-	
-	while siblings.has(gmn + gmni):
-		c += 1
-		gmni = str(c)
-	gmn += gmni
-	gm.name = gmn
-	
+	## add the new mesh as a child to scene root
 	ei.get_edited_scene_root().add_child(gm)
 	gm.owner = ei.get_edited_scene_root()
-	ei.edit_node(gm)
-	ei.get_selection()
-	
-	var es:EditorSelection = ei.get_selection()
 	
 	## remove other nodes from selection if desired
+	var es:EditorSelection = ei.get_selection()
 	var sna:Array = es.get_selected_nodes()
 	if unselect_other_nodes:
 		for n in sna:
@@ -152,7 +161,6 @@ func _on_preview_confirm() -> void:
 	## select newly created MeshInstance3D if desired
 	if select_generated_mesh:
 		es.add_node(gm)
-	
 	return
 
 func _exit_tree() -> void:
