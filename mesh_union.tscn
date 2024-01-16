@@ -1,0 +1,116 @@
+[gd_scene load_steps=2 format=3 uid="uid://nc2u5gx5mfsg"]
+
+[ext_resource type="Script" path="res://addons/mesh_union/mesh_union.gd" id="1_wxu7l"]
+
+[node name="MeshReunion" type="Control"]
+layout_mode = 3
+anchor_right = 0.265
+anchor_bottom = 1.0
+offset_right = -0.280029
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wxu7l")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 31.0
+grow_horizontal = 2
+text = "Join!"
+
+[node name="SelectedNodeLabel" type="Label" parent="."]
+layout_mode = 0
+offset_top = 35.0
+offset_right = 203.0
+offset_bottom = 58.0
+text = "Selected MeshInstance3D:"
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+offset_top = 58.0
+offset_bottom = 119.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SelectedNodeList" type="Label" parent="Panel/ScrollContainer"]
+layout_mode = 2
+
+[node name="NameLine" type="LineEdit" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 146.0
+offset_right = -1.0
+offset_bottom = 177.0
+grow_horizontal = 2
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 0
+offset_top = 123.0
+offset_right = 136.0
+offset_bottom = 146.0
+text = "New Mesh Name:"
+
+[node name="BoolPanelLabel" type="Label" parent="."]
+layout_mode = 0
+offset_top = 182.0
+offset_right = 201.0
+offset_bottom = 205.0
+text = "When Mesh Is Created:"
+
+[node name="BoolPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 205.0
+offset_right = -0.999939
+offset_bottom = 267.0
+grow_horizontal = 2
+
+[node name="SelectMeshBox" type="CheckBox" parent="BoolPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.003
+offset_right = -1.91202
+offset_bottom = 31.0
+button_pressed = true
+text = "Select Created Mesh"
+text_overrun_behavior = 1
+
+[node name="UnselectNodesBox" type="CheckBox" parent="BoolPanel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.003
+offset_top = 31.0
+offset_right = -1.91202
+offset_bottom = 62.0
+button_pressed = true
+text = "Unselect Other Nodes"
+text_overrun_behavior = 1
+
+[node name="ShowPreviewBox" type="CheckBox" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.003
+offset_top = 271.0
+offset_right = -1.91202
+offset_bottom = 302.0
+button_pressed = true
+text = "Show Preview"
+text_overrun_behavior = 1
+
+[connection signal="pressed" from="Button" to="." method="_on_join_button_pressed"]
+[connection signal="toggled" from="BoolPanel/SelectMeshBox" to="." method="_on_select_mesh_box_toggled"]
+[connection signal="toggled" from="BoolPanel/UnselectNodesBox" to="." method="_on_unselect_nodes_box_toggled"]
+[connection signal="toggled" from="ShowPreviewBox" to="." method="_on_show_preview_box_toggled"]
