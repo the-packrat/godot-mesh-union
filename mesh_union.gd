@@ -6,11 +6,14 @@
 @export var origin_name:String = ""
 
 var ei:EditorInterface
+var ur:EditorUndoRedoManager
 var generated_mesh:ArrayMesh
+var gm
 
 func _enter_tree() -> void:
 	## find editor interface
 	ei = EditorPlugin.new().get_editor_interface()
+	ur = EditorPlugin.new().get_undo_redo()
 	return
 
 func _input(event):
@@ -87,24 +90,26 @@ func _on_join_button_pressed() -> void:
 	c.add_child(cr)
 	
 	## draw text
-	var l:Label = Label.new()
-	c.add_child(l)
-	l.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	l.text = "Does this look okay?"
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.set("theme_override_font_sizes/font_size", 24)
-	cr.offset_bottom -= l.size.y
+	#var l:Label = Label.new()
+	#c.add_child(l)
+	#l.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	#l.text = "Does this look okay?"
+	#l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	#l.set("theme_override_font_sizes/font_size", 24)
+	#cr.offset_bottom -= l.size.y
 	
 	a.add_child(c)
 	a.popup_centered_ratio()
-	a.title = "NEW MESH PREVIEW JUST DROPPED!!!"
-	a.add_cancel_button("No")
+	a.title = "Mesh Preview"
+	var cb:Button = a.add_cancel_button("Cancel")
+	var ob:Button = a.get_ok_button()
+	ob.text = "Continue"
 	a.confirmed.connect(_on_preview_confirm)
 	return
 
 func _on_preview_confirm() -> void:
 	## create meshinstance3D and hand it to the edited scene
-	var gm:MeshInstance3D = MeshInstance3D.new()
+	gm = MeshInstance3D.new()
 	gm.mesh = generated_mesh
 	
 	## name the mesh
@@ -139,7 +144,6 @@ func _on_preview_confirm() -> void:
 		else:
 			gmni = "2"
 		
-		
 		## increment i until the new name is no longer identical to a sibling
 		i = int(gmni)
 		while siblings.has(gmn + gmni):
@@ -148,8 +152,11 @@ func _on_preview_confirm() -> void:
 		gm.name = gmn + gmni
 	
 	## add the new mesh as a child to scene root
-	ei.get_edited_scene_root().add_child(gm)
-	gm.owner = ei.get_edited_scene_root()
+	ur.create_action("Merge Mesh")
+	ur.add_do_method(ei.get_edited_scene_root(), "add_child", gm)
+	ur.add_do_property(gm, "owner", ei.get_edited_scene_root())
+	ur.add_undo_method(ei.get_edited_scene_root(), "remove_child", gm)
+	ur.commit_action()
 	
 	## remove other nodes from selection if desired
 	var es:EditorSelection = ei.get_selection()

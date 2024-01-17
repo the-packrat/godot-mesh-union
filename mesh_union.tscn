@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://addons/mesh_union/mesh_union.gd" id="1_wxu7l"]
 
-[node name="MeshReunion" type="Control"]
+[node name="MeshUnion" type="Control"]
 layout_mode = 3
 anchor_right = 0.265
 anchor_bottom = 1.0
